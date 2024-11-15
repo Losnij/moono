@@ -2,18 +2,21 @@ package com.example.moono.controller;
 
 import com.example.moono.domain.Member;
 import com.example.moono.service.MemberService;
+import com.example.moono.token.JwtUtil;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/users")
+@RequestMapping("/member")
 public class MemberController {
 
     private final MemberService memberService;
+    private final JwtUtil jwtUtil;
 
-    public MemberController(MemberService memberService) {
+    public MemberController(MemberService memberService, JwtUtil jwtUtil) {
         this.memberService = memberService;
+        this.jwtUtil = jwtUtil;
     }
 
     // 회원 가입
@@ -36,5 +39,16 @@ public class MemberController {
     public ResponseEntity<Member> getMemberInfo(HttpServletRequest request) {
         String memberID = (String) request.getAttribute("memberID");
         return ResponseEntity.ok(memberService.getMemberInfo(memberID));
+    }
+
+    // 회원 로그인
+    @PostMapping("/login")
+    public ResponseEntity<String> login(@RequestParam String memberID, @RequestParam String password) {
+        if (memberService.authenticate(memberID, password)) { // 인증 성공
+            String token = jwtUtil.generateToken(memberID);
+            return ResponseEntity.ok(token);
+        } else {
+            return ResponseEntity.status(401).body("로그인 정보가 잘못되었습니다.");
+        }
     }
 }

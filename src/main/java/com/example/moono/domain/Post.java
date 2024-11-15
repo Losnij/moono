@@ -14,6 +14,9 @@ public class Post {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    private String memberID;
     private String title;
     private String content;
+
+    private int view = 0; // null 일 가능성 없음
 }
