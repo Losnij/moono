@@ -41,4 +41,11 @@ public class MemberService {
         return memberRepository.findByMemberID(memberID)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 회원입니다."));
     }
+
+    // 회원 정보 인증
+    public boolean authenticate(String memberID, String password) {
+        return memberRepository.findByMemberID(memberID)
+                .map(member -> member.getPassword().equals(password)) // 비밀번호 일치 확인
+                .orElse(false); // 회원이 없으면 false 반환
+    }
 }

@@ -2,6 +2,7 @@ package com.example.moono.controller;
 
 import com.example.moono.domain.Member;
 import com.example.moono.service.MemberService;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -24,14 +25,16 @@ public class MemberController {
 
     // 회원 탈퇴
     @DeleteMapping("/myPage")
-    public ResponseEntity<String> withdrawMember(@RequestParam String memberID) {
+    public ResponseEntity<String> withdrawMember(HttpServletRequest request) {
+        String memberID = (String) request.getAttribute("memberID");
         memberService.withdrawMember(memberID);
         return ResponseEntity.ok("회원 탈퇴 성공");
     }
 
+    // 회원 조회
     @GetMapping("/myPage")
-    public ResponseEntity<Member> getMemberInfo(@RequestParam String memberID) {
-        Member member = memberService.getMemberInfo(memberID);
-        return ResponseEntity.ok(member);
+    public ResponseEntity<Member> getMemberInfo(HttpServletRequest request) {
+        String memberID = (String) request.getAttribute("memberID");
+        return ResponseEntity.ok(memberService.getMemberInfo(memberID));
     }
 }
