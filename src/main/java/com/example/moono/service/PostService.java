@@ -15,10 +15,11 @@ public class PostService {
 
     // 게시글 등록
     public Post createPost(String memberID, String title, String content) {
-        Post post = new Post();
-        post.setMemberID(memberID);
-        post.setTitle(title);
-        post.setContent(content);
+        Post post = Post.builder()
+                .memberID(memberID)
+                .title(title)
+                .content(content)
+                .build();
         return postRepository.save(post);
     }
 
@@ -26,19 +27,21 @@ public class PostService {
     public Post updatePost(Long postId, String memberID, String title, String content) {
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new IllegalArgumentException("게시글이 존재하지 않습니다."));
-        if (!post.getMemberID().equals(memberID)) {
+        if (!post.canBeModifiedBy(memberID)) {
             throw new SecurityException("본인이 작성한 게시글만 수정할 수 있습니다.");
         }
-        post.setTitle(title);
-        post.setContent(content);
-        return postRepository.save(post);
+        Post updated = post.toBuilder()
+                .title(title)
+                .content(content)
+                .build();
+        return postRepository.save(updated);
     }
 
     // 게시글 삭제
     public void deletePost(Long postId, String memberID) {
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new IllegalArgumentException("게시글이 존재하지 않습니다."));
-        if (!post.getMemberID().equals(memberID)) {
+        if (!post.canBeModifiedBy(memberID)) {
             throw new SecurityException("본인이 작성한 게시글만 삭제할 수 있습니다.");
         }
         postRepository.delete(post);
@@ -48,7 +51,7 @@ public class PostService {
     public Post getPost(Long postId) {
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new IllegalArgumentException("게시글이 존재하지 않습니다."));
-        post.setView(post.getView() + 1); // 조회수 증가
+        post.increment(); // 조회수 증가
         return postRepository.save(post);
     }
 }

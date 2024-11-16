@@ -1,6 +1,7 @@
 package com.example.moono.controller;
 
 import com.example.moono.domain.Post;
+import com.example.moono.dto.PostDto;
 import com.example.moono.service.PostService;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.ResponseEntity;
@@ -18,21 +19,21 @@ public class PostController {
 
     // 게시글 등록
     @PostMapping
-    public ResponseEntity<Post> createPost(HttpServletRequest request, @RequestBody Post post) {
+    public ResponseEntity<PostDto> createPost(HttpServletRequest request, @RequestBody Post post) {
         String memberID = (String) request.getAttribute("memberID");
-        Post createdPost = postService.createPost(memberID, post.getTitle(), post.getContent());
-        return ResponseEntity.ok(createdPost);
+        PostDto response = PostDto.fromEntity(postService.createPost(memberID, post.getTitle(), post.getContent()));
+        return ResponseEntity.ok(response);
     }
 
     // 게시글 수정
     @PutMapping("/{postId}")
-    public ResponseEntity<Post> updatePost(
+    public ResponseEntity<PostDto> updatePost(
             HttpServletRequest request,
             @PathVariable Long postId,
             @RequestBody Post post) {
         String memberID = (String) request.getAttribute("memberID");
-        Post updatedPost = postService.updatePost(postId, memberID, post.getTitle(), post.getContent());
-        return ResponseEntity.ok(updatedPost);
+        PostDto response = PostDto.fromEntity(postService.updatePost(postId, memberID, post.getTitle(), post.getContent()));
+        return ResponseEntity.ok(response);
     }
 
     // 게시글 삭제
@@ -45,8 +46,8 @@ public class PostController {
 
     // 게시글 조회
     @GetMapping("/{postId}")
-    public ResponseEntity<Post> getPost(@PathVariable Long postId) {
-        Post post = postService.getPost(postId);
-        return ResponseEntity.ok(post);
+    public ResponseEntity<PostDto> getPost(@PathVariable Long postId) {
+        PostDto response = PostDto.fromEntity(postService.getPost(postId));
+        return ResponseEntity.ok(response);
     }
 }

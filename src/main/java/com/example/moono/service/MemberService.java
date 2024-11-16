@@ -3,7 +3,6 @@ package com.example.moono.service;
 import com.example.moono.domain.Member;
 import com.example.moono.repository.MemberRepository;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class MemberService {
@@ -21,9 +20,10 @@ public class MemberService {
             throw new IllegalArgumentException("중복된 아이디를 사용할 수 없습니다.");
         }
 
-        Member member = new Member();
-        member.setMemberID(memberID);
-        member.setPassword(password);
+        Member member = Member.builder()
+                .memberID(memberID)
+                .password(password)
+                .build();
         memberRepository.save(member);
 
         return "회원 가입 성공";

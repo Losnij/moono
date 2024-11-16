@@ -1,6 +1,6 @@
 package com.example.moono.controller;
 
-import com.example.moono.domain.Member;
+import com.example.moono.dto.MemberDto;
 import com.example.moono.service.MemberService;
 import com.example.moono.token.JwtUtil;
 import jakarta.servlet.http.HttpServletRequest;
@@ -36,9 +36,10 @@ public class MemberController {
 
     // 회원 조회
     @GetMapping("/myPage")
-    public ResponseEntity<Member> getMemberInfo(HttpServletRequest request) {
+    public ResponseEntity<MemberDto> getMemberInfo(HttpServletRequest request) {
         String memberID = (String) request.getAttribute("memberID");
-        return ResponseEntity.ok(memberService.getMemberInfo(memberID));
+        MemberDto response = MemberDto.fromEntity(memberService.getMemberInfo(memberID));
+        return ResponseEntity.ok(response);
     }
 
     // 회원 로그인
