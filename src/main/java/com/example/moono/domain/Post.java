@@ -10,13 +10,20 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 public class Post {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private Long id; // Primary Key
 
-    private String memberID;
-    private String title;
-    private String content;
+    @Column(nullable = false)
+    private String memberID; // 작성자 memberID
 
-    private int view = 0; // null 일 가능성 없음
+    @Column(nullable = false)
+    private String title; // 게시글 제목
+
+    @Column(nullable = false)
+    private String content; // 게시글 본문
+
+    @Column(nullable = false)
+    private int view = 0; // 게시글 조회수
 }
