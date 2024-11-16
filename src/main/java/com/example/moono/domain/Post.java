@@ -33,19 +33,4 @@ public class Post {
     public boolean canBeModifiedBy(String memberID){
         return this.memberID.equals(memberID);
     }
-
-    /*
-    EqualsAndHashCode 어노테이션으로 대체
-    @Override
-    public boolean equals(Object o){
-        if(this == o) return true;
-        if(o == null || getClass() != o.getClass()) return false;
-        Post post = (Post) o;
-        return this.id != null && this.id.equals(post.id);
-    }
-
-    @Override
-    public int hashCode(){
-        return id != null ? id.hashCode() : 0;
-    }*/
 }
