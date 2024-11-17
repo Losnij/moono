@@ -8,6 +8,7 @@ import com.example.moono.dto.CommentRequestDto;
 import com.example.moono.dto.CommentResponseDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -20,6 +21,7 @@ public class CommentService {
     private final PostRepository postRepository;
 
     // 댓글 추가
+    @Transactional
     public void addComment(Long postId, CommentRequestDto commentRequestDto) {
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new IllegalArgumentException("유효한 게시글이 아닙니다."));
@@ -43,6 +45,7 @@ public class CommentService {
     }
 
     // 특정 게시글의 모든 댓글과 대댓글 조회
+    @Transactional
     public List<CommentResponseDto> getAllCommentsOfPost(Long postId) {
         List<Comment> rootComments = commentRepository.findByPostIdAndParentIsNull(postId);
         List<CommentResponseDto> flattenedComments = new ArrayList<>();
@@ -53,6 +56,7 @@ public class CommentService {
     }
 
     // 특정 댓글과 그 하단에 있는 모든 대댓글 조회
+    @Transactional
     public List<CommentResponseDto> getCommentsOfComment(Long postId, Long commentId) {
         Comment comment = commentRepository.findByIdAndPostId(commentId, postId)
                 .orElseThrow(() -> new IllegalArgumentException("댓글이 존재하지 않습니다."));

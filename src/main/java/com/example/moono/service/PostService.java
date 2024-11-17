@@ -75,6 +75,7 @@ public class PostService {
     }
 
     // 게시글 리스트 조회
+    @Transactional
     public List<PostResponseDto> getPostsByPage(int page) {
         Pageable pageable = PageRequest.of(page - 1, 5);
         Page<Post> postPage = postRepository.findAll(pageable);
