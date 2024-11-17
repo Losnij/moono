@@ -1,6 +1,7 @@
 package com.example.moono.controller;
 
 import com.example.moono.domain.Post;
+import com.example.moono.dto.ExternalLinkDto;
 import com.example.moono.dto.PostRequestDto;
 import com.example.moono.dto.PostResponseDto;
 import com.example.moono.service.PostService;
@@ -60,5 +61,15 @@ public class PostController {
     public ResponseEntity<List<PostResponseDto>> getPostsByPage(@RequestParam int page) {
         List<PostResponseDto> postResponseDtoList = postService.getPostsByPage(page);
         return ResponseEntity.ok(postResponseDtoList);
+    }
+
+    // 외부 게시글 일괄 등록
+    @PostMapping("/import")
+    public ResponseEntity<String> importPosts(HttpServletRequest request,
+                                              @RequestBody ExternalLinkDto externalLinkDto) {
+        String memberID = (String) request.getAttribute("memberID");
+        String url = externalLinkDto.getUrl();
+        int importedCount = postService.importPosts(memberID, url);
+        return ResponseEntity.ok(importedCount + "개의 게시글이 등록되었습니다.");
     }
 }

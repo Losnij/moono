@@ -3,7 +3,6 @@ package com.example.moono.domain;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -20,18 +19,18 @@ public class Comment {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "post_id", nullable = false)
-    private Post post; // 댓글이 속한 게시글
+    private Post post;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "parent_id")
-    private Comment parent; // 부모 댓글 (없으면 null)
+    private Comment parent;
 
-    @OneToMany(mappedBy = "parent", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "parent", cascade = CascadeType.ALL)
     @Builder.Default
     private List<Comment> replies = new ArrayList<>(); // 대댓글 리스트
 
     @Column(nullable = false)
-    private String content; // 댓글 내용
+    private String content;
 
     public void addReply(Comment reply) {
         replies.add(reply);

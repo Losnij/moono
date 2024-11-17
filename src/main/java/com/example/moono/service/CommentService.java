@@ -1,6 +1,7 @@
 package com.example.moono.service;
 
 import com.example.moono.domain.Comment;
+import com.example.moono.domain.CommentList;
 import com.example.moono.domain.Post;
 import com.example.moono.repository.CommentRepository;
 import com.example.moono.repository.PostRepository;
@@ -48,11 +49,8 @@ public class CommentService {
     @Transactional
     public List<CommentResponseDto> getAllCommentsOfPost(Long postId) {
         List<Comment> rootComments = commentRepository.findByPostIdAndParentIsNull(postId);
-        List<CommentResponseDto> flattenedComments = new ArrayList<>();
-        for (Comment root : rootComments) {
-            flattenCommentTree(root, 0, flattenedComments);
-        }
-        return flattenedComments;
+        CommentList commentList = new CommentList(rootComments);
+        return commentList.flattenCommentTree();
     }
 
     // 특정 댓글과 그 하단에 있는 모든 대댓글 조회
@@ -60,20 +58,9 @@ public class CommentService {
     public List<CommentResponseDto> getCommentsOfComment(Long postId, Long commentId) {
         Comment comment = commentRepository.findByIdAndPostId(commentId, postId)
                 .orElseThrow(() -> new IllegalArgumentException("댓글이 존재하지 않습니다."));
-        List<CommentResponseDto> flattenedComments = new ArrayList<>();
-        flattenCommentTree(comment, 0, flattenedComments);
-        return flattenedComments;
-    }
-
-    // 대댓글 우선으로 depth 기록 후 순차적 출력
-    private void flattenCommentTree(Comment comment, int depth, List<CommentResponseDto> result) {
-        result.add(CommentResponseDto.builder()
-                .id(comment.getId())
-                .content(comment.getContent())
-                .depth(depth)
-                .build());
-        for (Comment reply : comment.getReplies()) {
-            flattenCommentTree(reply, depth + 1, result);
-        }
+        List<Comment> rootComments = new ArrayList<>();
+        rootComments.add(comment);
+        CommentList commentList = new CommentList(rootComments);
+        return commentList.flattenCommentTree();
     }
 }
