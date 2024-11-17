@@ -6,7 +6,7 @@ import lombok.Getter;
 
 @Getter
 @Builder
-public class PostDto {
+public class PostResponseDto {
 
     private Long id;
     private String memberID;
@@ -14,8 +14,8 @@ public class PostDto {
     private String content;
     private int view;
 
-    public static PostDto fromEntity(Post post) {
-        return PostDto.builder()
+    public static PostResponseDto fromEntity(Post post) {
+        return PostResponseDto.builder()
                 .id(post.getId())
                 .memberID(post.getMemberID())
                 .title(post.getTitle())

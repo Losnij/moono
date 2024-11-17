@@ -1,38 +1,41 @@
 package com.example.moono.controller;
 
 import com.example.moono.domain.Post;
-import com.example.moono.dto.PostDto;
+import com.example.moono.dto.PostRequestDto;
+import com.example.moono.dto.PostResponseDto;
 import com.example.moono.service.PostService;
 import jakarta.servlet.http.HttpServletRequest;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/posts")
+@RequiredArgsConstructor
 public class PostController {
 
     private final PostService postService;
 
-    public PostController(PostService postService) {
-        this.postService = postService;
-    }
-
     // 게시글 등록
     @PostMapping
-    public ResponseEntity<PostDto> createPost(HttpServletRequest request, @RequestBody Post post) {
+    public ResponseEntity<PostResponseDto> createPost(HttpServletRequest request, @RequestBody PostRequestDto postRequestDto) {
+        Post post = postRequestDto.toEntity();
         String memberID = (String) request.getAttribute("memberID");
-        PostDto response = PostDto.fromEntity(postService.createPost(memberID, post.getTitle(), post.getContent()));
+        PostResponseDto response = PostResponseDto.fromEntity(postService.createPost(memberID, post.getTitle(), post.getContent()));
         return ResponseEntity.ok(response);
     }
 
     // 게시글 수정
     @PutMapping("/{postId}")
-    public ResponseEntity<PostDto> updatePost(
+    public ResponseEntity<PostResponseDto> updatePost(
             HttpServletRequest request,
             @PathVariable Long postId,
-            @RequestBody Post post) {
+            @RequestBody PostRequestDto postRequestDto) {
+        Post post = postRequestDto.toEntity();
         String memberID = (String) request.getAttribute("memberID");
-        PostDto response = PostDto.fromEntity(postService.updatePost(postId, memberID, post.getTitle(), post.getContent()));
+        PostResponseDto response = PostResponseDto.fromEntity(postService.updatePost(postId, memberID, post.getTitle(), post.getContent()));
         return ResponseEntity.ok(response);
     }
 
@@ -46,8 +49,16 @@ public class PostController {
 
     // 게시글 조회
     @GetMapping("/{postId}")
-    public ResponseEntity<PostDto> getPost(@PathVariable Long postId) {
-        PostDto response = PostDto.fromEntity(postService.getPost(postId));
+    public ResponseEntity<PostResponseDto> getPost(HttpServletRequest request, @PathVariable Long postId) {
+        String memberID = (String) request.getAttribute("memberID");
+        PostResponseDto response = PostResponseDto.fromEntity(postService.getPost(postId, memberID));
         return ResponseEntity.ok(response);
+    }
+
+    // 게시글 리스트 조회
+    @GetMapping
+    public ResponseEntity<List<PostResponseDto>> getPostsByPage(@RequestParam int page) {
+        List<PostResponseDto> postResponseDtoList = postService.getPostsByPage(page);
+        return ResponseEntity.ok(postResponseDtoList);
     }
 }
