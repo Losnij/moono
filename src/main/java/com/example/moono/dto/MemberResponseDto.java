@@ -6,14 +6,14 @@ import lombok.Getter;
 
 @Getter
 @Builder
-public class MemberDto {
+public class MemberResponseDto {
 
     private Long id;
     private String memberID;
     private String password;
 
-    public static MemberDto fromEntity(Member member) {
-        return MemberDto.builder()
+    public static MemberResponseDto fromEntity(Member member) {
+        return MemberResponseDto.builder()
                 .id(member.getId())
                 .memberID(member.getMemberID())
                 .password(member.getPassword())
