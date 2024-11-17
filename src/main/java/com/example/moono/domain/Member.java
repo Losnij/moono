@@ -12,13 +12,13 @@ public class Member {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id; // Primary Key
+    private Long id;
 
     @Column(nullable = false, unique = true)
-    private String memberID; // 아이디 (중복 불가)
+    private String memberID;
 
     @Column(nullable = false)
-    private String password; // 비밀번호
+    private String password;
 
     @Override
     public boolean equals(Object o) {

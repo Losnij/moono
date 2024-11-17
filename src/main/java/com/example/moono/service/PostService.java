@@ -4,14 +4,18 @@ import com.example.moono.domain.Post;
 import com.example.moono.dto.PostResponseDto;
 import com.example.moono.repository.PostRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.client.RestTemplate;
 
-import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -19,6 +23,7 @@ public class PostService {
 
     private final PostRepository postRepository;
     private final RedisService redisService;
+    private final RestTemplate restTemplate;
 
     // 게시글 등록
     @Transactional
@@ -63,12 +68,10 @@ public class PostService {
             return post;
         }
 
-        LocalDateTime viewTime = redisService.getViewTime(postId, memberID);
-        if (viewTime == null || viewTime.isBefore(LocalDateTime.now().minusHours(24))) {
-            // 첫 조회거나 하루가 지난 경우
+        if (redisService.hasNotViewed(postId, memberID)) { // 하루 이내 조회 기록이 없는 경우
             redisService.updateView(postId, memberID);
-            post.increment(); // 조회수 증가
-            postRepository.save(post); // DB 업데이트
+            post.viewIncrement();
+            postRepository.save(post);
         }
 
         return post;
@@ -82,5 +85,32 @@ public class PostService {
         return postPage.getContent().stream()
                 .map(PostResponseDto::fromEntity)
                 .toList();
+    }
+
+    // 외부 게시글 일괄 등록
+    @Transactional
+    public int importPosts(String memberID, String url) {
+        ResponseEntity<Map<String, Object>> response = restTemplate.exchange(
+                url,
+                HttpMethod.GET,
+                null,
+                new ParameterizedTypeReference<>() {}
+        );
+
+        List<Map<String, Object>> posts = (List<Map<String, Object>>) response.getBody().get("posts");
+
+        List<Post> postEntities = posts.stream()
+                .map(post -> {
+                    Map<String, Object> source = (Map<String, Object>) post.get("_source");
+                    return Post.builder()
+                            .memberID(memberID)
+                            .title((String) source.get("title"))
+                            .content((String) source.get("id"))
+                            .build();
+                })
+                .toList();
+
+        postRepository.saveAll(postEntities);
+        return postEntities.size();
     }
 }

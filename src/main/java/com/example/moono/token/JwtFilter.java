@@ -1,8 +1,6 @@
 package com.example.moono.token;
 
-import com.example.moono.repository.MemberRepository;
 import com.example.moono.service.MemberService;
-import com.example.moono.token.JwtUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;

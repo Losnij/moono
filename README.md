@@ -35,6 +35,9 @@ Get /posts/{postId} : 게시글 상세 정보 조회
 - 본인이 작성한 글의 상세 정보를 조회할 경우 조회수가 카운트 되지 않음
 - 상세 정보를 조회한 계정은 24시간 동안 추가로 카운트 되지 않음
 
+Post /posts/import : 외부 게시글 일괄 등록
+- title -> 제목, id -> 본문 매칭
+
 Post /posts/{postId}/comments : 댓글 및 대댓글 작성
 
 Get /posts/{postId}/comments : 게시글의 모든 댓글 및 대댓글 조회
